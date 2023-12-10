@@ -10,5 +10,8 @@ services:
     build: npm_project
     container_name: 'npm'
     tty: true
+    command: bash -c "cd www; NODE_OPTIONS='--openssl-legacy-provider' npm run start;"
+    ports: 
+      - '8080:8080'
     volumes:
       - "./npm_project:/npm_project"
