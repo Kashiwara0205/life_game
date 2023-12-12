@@ -39,6 +39,16 @@ impl fmt::Display for Universe {
 #[wasm_bindgen]
 impl Universe {
 
+    pub fn set_width(&mut self, width: u32) {
+        self.width = width;
+        self.cells = (0..width * self.height).map(|_i| Cell::Dead).collect();
+    }
+
+    pub fn set_height(&mut self, height: u32) {
+        self.height = height;
+        self.cells = (0..self.width * height).map(|_i| Cell::Dead).collect();
+    }
+
     pub fn width(&self) -> u32 {
         self.width
     }
@@ -119,5 +129,52 @@ impl Universe {
         }
 
         self.cells = next;
+    }
+}
+
+impl Universe {
+    pub fn get_cells(&self) -> &[Cell] {
+        &self.cells
+    }
+
+    pub fn set_cells(&mut self, cells: &[(u32, u32)]) {
+        for (row, col) in cells.iter().cloned() {
+            let idx = self.get_index(row, col);
+            self.cells[idx] = Cell::Alive;
+        }
+    }
+
+}
+
+#[cfg(test)]
+pub fn input_spaceship() -> Universe {
+    let mut universe = Universe::new();
+    universe.set_width(6);
+    universe.set_height(6);
+    universe.set_cells(&[(1,2), (2,3), (3,1), (3,2), (3,3)]);
+    universe
+}
+
+#[cfg(test)]
+pub fn expected_spaceship() -> Universe {
+    let mut universe = Universe::new();
+    universe.set_width(6);
+    universe.set_height(6);
+    universe.set_cells(&[(2,1), (2,3), (3,2), (3,3), (4,2)]);
+    universe
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn it_works() {
+    let mut input_universe = input_spaceship();
+
+    let expected_universe = expected_spaceship();
+
+    input_universe.tick();
+    assert_eq!(&input_universe.get_cells(), &expected_universe.get_cells());
     }
 }
